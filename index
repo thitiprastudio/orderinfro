@@ -1,1 +1,332 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thitiprastudio Order System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff85a2;
+            --secondary: #6c757d;
+            --bg: #fdf2f4;
+            --white: #ffffff;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--white);
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            padding-bottom: 80px;
+        }
+
+        .page { display: none; padding: 20px; animation: fadeIn 0.3s; }
+        .page.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Home Page */
+        .profile-section { text-align: center; margin-top: 40px; }
+        .profile-img {
+            width: 150px; height: 150px;
+            object-fit: cover; border-radius: 15px;
+            border: 4px solid var(--primary);
+        }
+        .studio-name { font-size: 24px; font-weight: bold; margin: 15px 0; color: #444; }
+
+        .btn-main {
+            display: block; width: 100%; padding: 20px;
+            margin: 15px 0; border: none; border-radius: 12px;
+            background: var(--primary); color: white;
+            font-size: 18px; cursor: pointer; transition: 0.2s;
+        }
+        .btn-main:hover { transform: translateY(-2px); filter: brightness(1.05); }
+
+        /* Form Styling */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; }
+        input, select {
+            width: 100%; padding: 12px; border: 1px solid #ddd;
+            border-radius: 8px; box-sizing: border-box;
+        }
+        .checkbox-group { display: flex; gap: 15px; margin: 10px 0; }
+
+        /* Navigation Bar */
+        .nav-bar {
+            position: fixed; bottom: 0; width: 100%; max-width: 500px;
+            background: white; border-top: 1px solid #eee;
+            display: flex; justify-content: space-around; padding: 15px 0;
+        }
+        .nav-item { color: var(--secondary); cursor: pointer; text-align: center; flex: 1; }
+        .nav-item.active { color: var(--primary); }
+
+        /* Sheet Page */
+        .sheet-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+        th, td { border: 1px solid #eee; padding: 10px; text-align: left; }
+        th { background: var(--primary); color: white; }
+        .tab-menu { display: flex; overflow-x: auto; gap: 5px; margin-bottom: 15px; padding-bottom: 5px; }
+        .tab-btn { 
+            padding: 8px 15px; background: #eee; border: none; 
+            border-radius: 20px; white-space: nowrap; cursor: pointer;
+        }
+        .tab-btn.active { background: var(--primary); color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <!-- หน้าแรก -->
+    <div id="home" class="page active">
+        <div class="profile-section">
+            <img src="https://via.placeholder.com/150" alt="Profile" class="profile-img">
+            <div class="studio-name">Thitiprastudio</div>
+        </div>
+        <button class="btn-main" onclick="showPage('form1')">กรอกข้อมูลเครือ BR & PRH</button>
+        <button class="btn-main" onclick="showPage('form2')">กรอกข้อมูลเครืออื่นๆ</button>
+    </div>
+
+    <!-- ฟอร์ม 1: BR & PRH -->
+    <div id="form1" class="page">
+        <h3>เครือ BR & PRH</h3>
+        <div class="form-group">
+            <label>ชื่อฟอนต์</label>
+            <input type="text" id="f1_name">
+        </div>
+        <div class="form-group">
+            <label>อีเมลลูกค้า</label>
+            <input type="email" id="f1_email">
+        </div>
+        <div class="form-group">
+            <label>ชนิดการใช้งาน</label>
+            <select id="f1_type">
+                <option>ส่วนตัว</option>
+                <option>เชิงพาณิชย์</option>
+                <option>ส่วนตัว&เชิงพาณิชย์</option>
+                <option>บริษัท</option>
+            </select>
+        </div>
+        <div class="checkbox-group">
+            <label><input type="checkbox" id="f1_ship"> สถานะจัดส่ง</label>
+            <label><input type="checkbox" id="f1_cert"> ใบรับรอง</label>
+        </div>
+        <div class="form-group">
+            <label>ราคาขาย (บาท)</label>
+            <input type="number" id="f1_price">
+        </div>
+        <div class="form-group">
+            <label>ช่องทางการสั่งซื้อ</label>
+            <select id="f1_channel" onchange="toggleSlip(1)">
+                <option value="shop">สั่งร้าน (แนบสลิป)</option>
+                <option value="line">Line MyShop</option>
+            </select>
+        </div>
+        <div id="slip_area1" class="form-group">
+            <label>แนบสลิปโอน (จำลองข้อมูลสลิป)</label>
+            <input type="text" id="f1_slip_name" placeholder="ชื่อผู้โอน">
+            <input type="text" id="f1_slip_time" placeholder="วันที่/เวลา (เช่น 01/01 10:30)" style="margin-top:5px">
+        </div>
+        <button class="btn-main" onclick="saveData(1)">บันทึกข้อมูล</button>
+    </div>
+
+    <!-- ฟอร์ม 2: เครืออื่นๆ -->
+    <div id="form2" class="page">
+        <h3>เครืออื่นๆ</h3>
+        <div class="form-group">
+            <label>ชื่อฟอนต์</label>
+            <input type="text" id="f2_name">
+        </div>
+        <div class="form-group">
+            <label>อีเมลลูกค้า</label>
+            <input type="email" id="f2_email">
+        </div>
+        <div class="form-group">
+            <label>เครือ</label>
+            <select id="f2_network">
+                <option>พี่จ่าง</option>
+                <option>tcs</option>
+                <option>kt</option>
+                <option>tau</option>
+                <option>tp</option>
+                <option>novel/eb</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>ชนิดการใช้งาน</label>
+            <select id="f2_type">
+                <option>ส่วนตัว</option>
+                <option>เชิงพาณิชย์</option>
+                <option>ส่วนตัว&เชิงพาณิชย์</option>
+                <option>บริษัท</option>
+            </select>
+        </div>
+        <div class="checkbox-group">
+            <label><input type="checkbox" id="f2_ship"> สถานะจัดส่ง</label>
+            <label><input type="checkbox" id="f2_cert"> ใบรับรอง</label>
+        </div>
+        <div class="form-group" style="display: flex; gap: 10px;">
+            <div style="flex:1">
+                <label>ราคาขาย</label>
+                <input type="number" id="f2_price">
+            </div>
+            <div style="flex:1">
+                <label>เรท</label>
+                <input type="number" id="f2_rate">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>ข้อมูลสลิป</label>
+            <input type="text" id="f2_slip_name" placeholder="ชื่อผู้โอน">
+            <input type="text" id="f2_slip_time" placeholder="วันที่/เวลา">
+        </div>
+        <button class="btn-main" onclick="saveData(2)">บันทึกข้อมูล</button>
+    </div>
+
+    <!-- หน้าเอกสาร (Sheet) -->
+    <div id="docs" class="page">
+        <h3>เอกสารทั้งหมด</h3>
+        <div class="tab-menu" id="tabMenu">
+            <!-- Tabs generated by JS -->
+        </div>
+        <div class="sheet-container" id="sheetContent">
+            <p style="text-align:center; color:#999;">กรุณาเลือกแผ่นงาน</p>
+        </div>
+    </div>
+
+    <!-- แถบเมนูด้านล่าง -->
+    <div class="nav-bar">
+        <div class="nav-item active" onclick="showPage('home')" id="nav-home">
+            <i class="fas fa-home"></i><br>Home
+        </div>
+        <div class="nav-item" onclick="showPage('docs')" id="nav-docs">
+            <i class="fas fa-file-alt"></i><br>เอกสาร
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // ฐานข้อมูลจำลอง
+    let database = {
+        'BR_PRH': [],
+        'BR_PRH_SLIP': [],
+        'พี่จ่าง': [], 'พี่จ่าง_SLIP': [],
+        'tcs': [], 'tcs_SLIP': [],
+        'kt': [], 'kt_SLIP': [],
+        'tau': [], 'tau_SLIP': [],
+        'tp': [], 'tp_SLIP': [],
+        'novel_eb': [], 'novel_eb_SLIP': []
+    };
+
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        if(pageId === 'home') document.getElementById('nav-home').classList.add('active');
+        if(pageId === 'docs') {
+            document.getElementById('nav-docs').classList.add('active');
+            renderTabMenu();
+        }
+    }
+
+    function toggleSlip(formNum) {
+        const channel = document.getElementById('f1_channel').value;
+        document.getElementById('slip_area1').style.display = (channel === 'line') ? 'none' : 'block';
+    }
+
+    function saveData(type) {
+        if(type === 1) {
+            const data = {
+                font: document.getElementById('f1_name').value,
+                email: document.getElementById('f1_email').value,
+                usage: document.getElementById('f1_type').value,
+                price: document.getElementById('f1_price').value,
+                channel: document.getElementById('f1_channel').value
+            };
+            database['BR_PRH'].push(data);
+            
+            const slip = {
+                date: document.getElementById('f1_slip_time').value,
+                name: data.channel === 'line' ? 'Line MyShop' : document.getElementById('f1_slip_name').value,
+                amount: data.price
+            };
+            database['BR_PRH_SLIP'].push(slip);
+
+        } else {
+            const network = document.getElementById('f2_network').value.replace('/', '_');
+            const price = parseFloat(document.getElementById('f2_price').value) || 0;
+            const rate = parseFloat(document.getElementById('f2_rate').value) || 0;
+            
+            const data = {
+                font: document.getElementById('f2_name').value,
+                email: document.getElementById('f2_email').value,
+                usage: document.getElementById('f2_type').value,
+                price: price,
+                profit: price - rate
+            };
+            database[network].push(data);
+
+            const slip = {
+                date: document.getElementById('f2_slip_time').value,
+                name: document.getElementById('f2_slip_name').value,
+                amount: price
+            };
+            database[network + '_SLIP'].push(slip);
+        }
+        alert('บันทึกข้อมูลเรียบร้อย!');
+        showPage('home');
+    }
+
+    function renderTabMenu() {
+        const menu = document.getElementById('tabMenu');
+        const networks = ['BR_PRH', 'พี่จ่าง', 'tcs', 'kt', 'tau', 'novel_eb', 'tp'];
+        menu.innerHTML = '';
+        networks.forEach(net => {
+            menu.innerHTML += `<button class="tab-btn" onclick="renderSheet('${net}')">แผ่น ${net}</button>`;
+            menu.innerHTML += `<button class="tab-btn" onclick="renderSheet('${net}_SLIP')">สลิป ${net}</button>`;
+        });
+    }
+
+    function renderSheet(key) {
+        const content = document.getElementById('sheetContent');
+        const data = database[key];
+        
+        let html = `<h4>แผ่นงาน: ${key}</h4><table>`;
+        
+        if(key.includes('_SLIP')) {
+            html += `<tr><th>วันที่/เวลา</th><th>ชื่อคนโอน</th><th>ยอดโอน</th></tr>`;
+            data.forEach(item => {
+                html += `<tr><td>${item.date}</td><td>${item.name}</td><td>${item.amount}</td></tr>`;
+            });
+        } else {
+            html += `<tr><th>ชื่อฟอนต์</th><th>เมล</th><th>ชนิด</th><th>ราคา</th>${key !== 'BR_PRH' ? '<th>กำไร</th>' : ''}</tr>`;
+            data.forEach(item => {
+                html += `<tr><td>${item.font}</td><td>${item.email}</td><td>${item.usage}</td><td>${item.price}</td>${item.profit !== undefined ? `<td>${item.profit}</td>` : ''}</tr>`;
+            });
+        }
+        
+        html += `</table>`;
+        content.innerHTML = html;
+
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.innerText.includes(key));
+        });
+    }
+</script>
+
+</body>
+</html>
