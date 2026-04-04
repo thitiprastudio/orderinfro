@@ -3,28 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thitiprastudio - Bulk Order</title>
+    <title>Thitiprastudio - Order System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root { --primary: #ff85a2; --bg: #fdf2f4; }
-        body { font-family: 'Kanit', sans-serif; background: var(--bg); margin: 0; padding: 15px; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 25px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        body { font-family: 'Kanit', sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; }
+        .container { max-width: 480px; margin: auto; padding: 20px; }
+        
         .profile { text-align: center; margin-bottom: 20px; }
         .profile img { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; }
         
-        .font-item { background: #fff9fa; border: 1px solid #ffe4e9; padding: 15px; border-radius: 15px; margin-bottom: 15px; position: relative; }
-        .btn-remove { position: absolute; top: 10px; right: 10px; color: #ff4d4d; cursor: pointer; border: none; background: none; font-size: 18px; }
+        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        .font-item { background: #fff9fa; padding: 15px; border-radius: 15px; border: 1px solid #ffe4e9; margin-bottom: 15px; position: relative; }
         
-        label { display: block; margin-top: 10px; font-weight: bold; font-size: 13px; color: #666; }
-        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+        input, select { width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #eee; border-radius: 10px; box-sizing: border-box; font-size: 14px; }
+        .btn-add { background: white; color: var(--primary); border: 2px dashed var(--primary); padding: 12px; width: 100%; border-radius: 12px; cursor: pointer; font-weight: bold; margin-bottom: 20px; }
+        .btn-submit { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 15px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(255,133,162,0.3); }
+        .btn-remove { position: absolute; top: 10px; right: 10px; color: #ff4d4d; border: none; background: none; font-size: 20px; cursor: pointer; }
         
-        .row { display: flex; gap: 8px; }
-        .col { flex: 1; }
-        
-        .btn-add { background: #fff; color: var(--primary); border: 2px dashed var(--primary); padding: 10px; width: 100%; border-radius: 10px; cursor: pointer; font-weight: bold; margin-bottom: 20px; }
-        .btn-submit { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 14px; font-size: 18px; font-weight: bold; cursor: pointer; }
-        
-        #preview { width: 100%; margin-top: 10px; border-radius: 10px; display: none; }
-        .loader { display: none; text-align: center; color: var(--primary); font-weight: bold; margin-top: 15px; }
+        #preview { width: 100%; border-radius: 12px; margin-top: 10px; display: none; border: 1px solid #eee; }
+        .loader { display: none; text-align: center; color: var(--primary); font-weight: bold; padding: 10px; }
     </style>
 </head>
 <body>
@@ -36,103 +34,84 @@
     </div>
 
     <form id="orderForm">
-        <div class="row">
-            <div class="col">
-                <label>วันที่แจ้งโอน</label>
-                <input type="date" id="orderDate" required>
+        <div class="card">
+            <div style="display:flex; gap:10px;">
+                <div style="flex:1"><label style="font-size:12px;">วันที่แจ้งโอน</label><input type="date" id="orderDate" required></div>
+                <div style="flex:1"><label style="font-size:12px;">เวลา</label><input type="time" id="orderTime" required></div>
             </div>
-            <div class="col">
-                <label>เวลา</label>
-                <input type="time" id="orderTime" required>
-            </div>
-        </div>
-        <label>อีเมลลูกค้า</label>
-        <input type="email" id="email" placeholder="customer@email.com" required>
-
-        <div id="fontItemsContainer">
-            </div>
-
-        <button type="button" class="btn-add" onclick="addFontItem()">+ เพิ่มฟอนต์อีกรายการ</button>
-
-        <hr style="border:0; border-top:1px solid #eee;">
-
-        <label>ช่องทางการสั่งซื้อ</label>
-        <select id="channel" onchange="toggleSlip()">
-            <option value="direct">สั่งผ่านร้าน (แนบสลิป)</option>
-            <option value="line">Line MyShop</option>
-        </select>
-
-        <div id="slipArea">
-            <label>แนบสลิปโอนเงิน (ใบเดียวรวมทุกรายการ)</label>
-            <input type="file" id="slipFile" accept="image/*" onchange="previewImage()">
-            <img id="preview">
+            <input type="email" id="email" placeholder="อีเมลลูกค้า" required>
         </div>
 
-        <div class="loader" id="loader">🚀 กำลังบันทึกข้อมูลทุกรายการ...</div>
+        <div id="fontList"></div>
+        <button type="button" class="btn-add" onclick="addFont()">+ เพิ่มรายการฟอนต์</button>
+
+        <div class="card">
+            <label style="font-size:12px;">ช่องทางการสั่งซื้อ</label>
+            <select id="channel" onchange="toggleSlip()">
+                <option value="direct">สั่งผ่านร้าน (แนบสลิป)</option>
+                <option value="line">Line MyShop</option>
+            </select>
+
+            <div id="slipArea">
+                <label style="font-size:12px; margin-top:10px; display:block;">แนบสลิปโอนเงิน (ใบเดียวรวมทุกฟอนต์)</label>
+                <input type="file" id="slipFile" accept="image/*" onchange="previewImg()">
+                <img id="preview">
+            </div>
+        </div>
+
+        <div class="loader" id="loader">🚀 กำลังบันทึกข้อมูล...</div>
         <button type="submit" class="btn-submit" id="submitBtn">บันทึกข้อมูลออเดอร์</button>
     </form>
 </div>
 
 <script>
+    // *** สำคัญ: เปลี่ยน URL เป็นอันที่คุณ Deploy ล่าสุด ***
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzL5HNhVCzogiMnfLMx0gbb067OdHcvFbH97BjgMSMVVnnlMrS3rdUF-rWbpWygt7xd/exec"; 
 
     document.getElementById('orderDate').valueAsDate = new Date();
 
-    function addFontItem() {
-        const container = document.getElementById('fontItemsContainer');
+    function addFont() {
         const div = document.createElement('div');
         div.className = 'font-item';
         div.innerHTML = `
             <button type="button" class="btn-remove" onclick="this.parentElement.remove()">×</button>
-            <label>เครือฟอนต์</label>
-            <select class="item-network" onchange="toggleRate(this)">
-                <option value="BR_PRH">BR & PRH</option>
-                <option value="P_Jang">พี่จ่าง</option>
-                <option value="TCS">TCS</option>
-                <option value="KT">KT</option>
-                <option value="TAU">TAU</option>
-                <option value="TP">TP</option>
+            <label style="font-size:12px;">เครือฟอนต์</label>
+            <select class="net" onchange="checkNet(this)">
+                <option value="BR_PRH">BR & PRH</option><option value="P_Jang">พี่จ่าง</option>
+                <option value="TCS">TCS</option><option value="KT">KT</option>
+                <option value="TAU">TAU</option><option value="TP">TP</option>
                 <option value="Novel_EB">Novel/EB</option>
             </select>
-            <label>ชื่อฟอนต์</label>
-            <input type="text" class="item-name" placeholder="ระบุชื่อฟอนต์..." required>
-            <div class="row">
-                <div class="col">
-                    <label>ราคาขาย</label>
-                    <input type="number" class="item-price" required>
-                </div>
-                <div class="col rate-group" style="display:none;">
-                    <label>เรท (ต้นทุน)</label>
-                    <input type="number" class="item-rate" value="0">
-                </div>
+            <input type="text" class="fname" placeholder="ชื่อฟอนต์" required>
+            <div style="display:flex; gap:10px;">
+                <div style="flex:1"><input type="number" class="fprice" placeholder="ราคาขาย" required></div>
+                <div style="flex:1; display:none;" class="rate-box"><input type="number" class="frate" placeholder="เรท" value="0"></div>
             </div>
-            <label>ชนิดการใช้งาน</label>
-            <select class="item-usage">
-                <option>ส่วนตัว</option><option>เชิงพาณิชย์</option><option>บริษัท</option>
-            </select>
-            <div class="row" style="margin-top:10px;">
-                <label style="margin:0;"><input type="checkbox" class="item-ship"> จัดส่งแล้ว</label>
-                <label style="margin:0; margin-left:15px;"><input type="checkbox" class="item-cert"> ใบรับรอง</label>
+            <select class="fusage"><option>ส่วนตัว</option><option>เชิงพาณิชย์</option><option>บริษัท</option></select>
+            <div style="margin-top:10px; font-size:13px;">
+                <label><input type="checkbox" class="fship"> จัดส่งแล้ว</label>
+                <label style="margin-left:15px;"><input type="checkbox" class="fcert"> ใบรับรอง</label>
             </div>
         `;
-        container.appendChild(div);
+        document.getElementById('fontList').appendChild(div);
     }
 
-    function toggleRate(select) {
-        const rateGroup = select.parentElement.querySelector('.rate-group');
-        rateGroup.style.display = (select.value === "BR_PRH") ? "none" : "block";
+    function checkNet(s) {
+        s.parentElement.querySelector('.rate-box').style.display = (s.value === 'BR_PRH') ? 'none' : 'block';
     }
 
     function toggleSlip() {
-        document.getElementById('slipArea').style.display = (document.getElementById('channel').value === "line") ? "none" : "block";
+        document.getElementById('slipArea').style.display = (document.getElementById('channel').value === 'line') ? 'none' : 'block';
     }
 
-    function previewImage() {
+    function previewImg() {
         const file = document.getElementById('slipFile').files[0];
-        const preview = document.getElementById('preview');
         if (file) {
             const reader = new FileReader();
-            reader.onload = (e) => { preview.src = e.target.result; preview.style.display = 'block'; };
+            reader.onload = (e) => { 
+                const p = document.getElementById('preview');
+                p.src = e.target.result; p.style.display = 'block'; 
+            };
             reader.readAsDataURL(file);
         }
     }
@@ -141,17 +120,17 @@
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
         const loader = document.getElementById('loader');
+        
         btn.disabled = true; loader.style.display = 'block';
 
-        const fontElements = document.querySelectorAll('.font-item');
-        const fontItems = Array.from(fontElements).map(el => ({
-            network: el.querySelector('.item-network').value,
-            fontName: el.querySelector('.item-name').value,
-            price: el.querySelector('.item-price').value,
-            rate: el.querySelector('.item-rate').value,
-            usageType: el.querySelector('.item-usage').value,
-            shipStatus: el.querySelector('.item-ship').checked ? "จัดส่งแล้ว" : "-",
-            certStatus: el.querySelector('.item-cert').checked ? "มีใบรับรอง" : "-"
+        const items = Array.from(document.querySelectorAll('.font-item')).map(el => ({
+            network: el.querySelector('.net').value,
+            fontName: el.querySelector('.fname').value,
+            price: el.querySelector('.fprice').value,
+            rate: el.querySelector('.frate').value,
+            usageType: el.querySelector('.fusage').value,
+            shipStatus: el.querySelector('.fship').checked ? "จัดส่งแล้ว" : "-",
+            certStatus: el.querySelector('.fcert').checked ? "มีใบรับรอง" : "-"
         }));
 
         const payload = {
@@ -159,28 +138,30 @@
             orderTime: document.getElementById('orderTime').value,
             email: document.getElementById('email').value,
             channel: document.getElementById('channel').value,
-            fontItems: fontItems
+            fontItems: items
         };
 
         const fileInput = document.getElementById('slipFile');
-        if (fileInput.files[0] && payload.channel !== "line") {
+        if (fileInput.files[0] && payload.channel !== 'line') {
             const reader = new FileReader();
-            payload.image = await new Promise(resolve => {
-                reader.onload = (e) => resolve(e.target.result);
-                reader.readAsDataURL(fileInput.files[0]);
+            payload.image = await new Promise(r => { 
+                reader.onload = (ev) => r(ev.target.result); 
+                reader.readAsDataURL(fileInput.files[0]); 
             });
         }
 
         try {
             await fetch(WEB_APP_URL, { method: "POST", mode: 'no-cors', body: JSON.stringify(payload) });
-            alert("✨ บันทึกสำเร็จทุกรายการ!");
+            alert("✨ บันทึกออเดอร์สำเร็จ!");
             location.reload();
-        } catch (error) { alert("บันทึกสำเร็จ (โปรดเช็คใน Sheet)"); }
-        finally { btn.disabled = false; loader.style.display = 'none'; }
+        } catch (err) {
+            alert("บันทึกสำเร็จ (โปรดตรวจสอบที่ Google Sheet)");
+        } finally {
+            btn.disabled = false; loader.style.display = 'none';
+        }
     };
 
-    // เพิ่มรายการแรกอัตโนมัติ
-    addFontItem();
+    addFont(); // สร้างรายการแรกเริ่มต้น
 </script>
 </body>
 </html>
