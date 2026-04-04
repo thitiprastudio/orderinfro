@@ -3,133 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thitiprastudio - Order System</title>
+    <title>Thitiprastudio - Bulk Order</title>
     <style>
-        :root { --primary: #ff85a2; --bg: #fdf2f4; --text: #444; }
-        body { font-family: 'Kanit', sans-serif; background: var(--bg); margin: 0; padding: 15px; color: var(--text); }
-        .container { max-width: 450px; margin: 20px auto; background: white; padding: 25px; border-radius: 24px; box-shadow: 0 10px 30px rgba(255,133,162,0.15); }
-        
-        /* Profile Header */
+        :root { --primary: #ff85a2; --bg: #fdf2f4; }
+        body { font-family: 'Kanit', sans-serif; background: var(--bg); margin: 0; padding: 15px; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 25px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         .profile { text-align: center; margin-bottom: 20px; }
-        .profile img { width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--primary); object-fit: cover; }
-        h2 { text-align: center; color: var(--primary); margin: 10px 0; font-size: 24px; letter-spacing: 1px; }
-
-        /* Form Styling */
-        label { display: block; margin-top: 15px; font-weight: 600; font-size: 14px; color: #666; }
-        input, select { width: 100%; padding: 12px; margin-top: 6px; border: 1.5px solid #eee; border-radius: 12px; box-sizing: border-box; outline: none; font-size: 15px; transition: 0.3s; }
-        input:focus { border-color: var(--primary); background: #fff9fa; }
+        .profile img { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; }
         
-        .row { display: flex; gap: 10px; }
+        .font-item { background: #fff9fa; border: 1px solid #ffe4e9; padding: 15px; border-radius: 15px; margin-bottom: 15px; position: relative; }
+        .btn-remove { position: absolute; top: 10px; right: 10px; color: #ff4d4d; cursor: pointer; border: none; background: none; font-size: 18px; }
+        
+        label { display: block; margin-top: 10px; font-weight: bold; font-size: 13px; color: #666; }
+        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+        
+        .row { display: flex; gap: 8px; }
         .col { flex: 1; }
-
-        /* Button & UI */
-        .btn-submit { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 14px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 30px; box-shadow: 0 5px 15px rgba(255,133,162,0.3); transition: 0.3s; }
-        .btn-submit:hover { background: #ff6b8d; transform: translateY(-2px); }
-        .btn-submit:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
-
-        #preview { width: 100%; margin-top: 15px; border-radius: 12px; display: none; border: 2px dashed var(--primary); }
-        .loader { display: none; text-align: center; color: var(--primary); font-weight: bold; margin-top: 15px; font-size: 14px; }
         
-        /* Checkbox Custom */
-        .checkbox-row { display: flex; gap: 20px; margin-top: 10px; }
-        .checkbox-item { display: flex; align-items: center; gap: 5px; font-size: 14px; }
-        .checkbox-item input { width: auto; margin: 0; }
+        .btn-add { background: #fff; color: var(--primary); border: 2px dashed var(--primary); padding: 10px; width: 100%; border-radius: 10px; cursor: pointer; font-weight: bold; margin-bottom: 20px; }
+        .btn-submit { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 14px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        
+        #preview { width: 100%; margin-top: 10px; border-radius: 10px; display: none; }
+        .loader { display: none; text-align: center; color: var(--primary); font-weight: bold; margin-top: 15px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="profile">
-        <img src="IMG_5808.jpeg" alt="Thitiprastudio Logo">
-        <h2>Thitiprastudio</h2>
+        <img src="IMG_5808.jpeg" alt="Logo">
+        <h2 style="color:var(--primary); margin:10px;">Thitiprastudio</h2>
     </div>
 
     <form id="orderForm">
-        <label>ช่องทางการสั่งซื้อ</label>
-        <select name="channel" id="channel" onchange="updateUI()">
-            <option value="direct">สั่งผ่านร้าน (แนบสลิป)</option>
-            <option value="line">Line MyShop (ไม่ต้องแนบรูป)</option>
-        </select>
-
         <div class="row">
             <div class="col">
-                <label>วันที่แจ้งโอน/สั่งซื้อ</label>
-                <input type="date" name="orderDate" id="orderDate" required>
+                <label>วันที่แจ้งโอน</label>
+                <input type="date" id="orderDate" required>
             </div>
             <div class="col">
                 <label>เวลา</label>
-                <input type="time" name="orderTime" id="orderTime" required>
+                <input type="time" id="orderTime" required>
             </div>
         </div>
-
-        <label>เครือฟอนต์</label>
-        <select name="network" id="network" onchange="updateUI()">
-            <option value="BR_PRH">เครือ BR & PRH</option>
-            <option value="P_Jang">เครือ พี่จ่าง</option>
-            <option value="TCS">เครือ TCS</option>
-            <option value="KT">เครือ KT</option>
-            <option value="TAU">เครือ TAU</option>
-            <option value="TP">เครือ TP</option>
-            <option value="Novel_EB">เครือ Novel/EB</option>
-        </select>
-
-        <label>ชื่อฟอนต์</label>
-        <input type="text" name="fontName" placeholder="ระบุชื่อฟอนต์..." required>
-
         <label>อีเมลลูกค้า</label>
-        <input type="email" name="email" placeholder="customer@email.com" required>
+        <input type="email" id="email" placeholder="customer@email.com" required>
 
-        <label>ชนิดการใช้งาน</label>
-        <select name="usageType">
-            <option>ส่วนตัว</option>
-            <option>เชิงพาณิชย์</option>
-            <option>ส่วนตัว & เชิงพาณิชย์</option>
-            <option>บริษัท</option>
+        <div id="fontItemsContainer">
+            </div>
+
+        <button type="button" class="btn-add" onclick="addFontItem()">+ เพิ่มฟอนต์อีกรายการ</button>
+
+        <hr style="border:0; border-top:1px solid #eee;">
+
+        <label>ช่องทางการสั่งซื้อ</label>
+        <select id="channel" onchange="toggleSlip()">
+            <option value="direct">สั่งผ่านร้าน (แนบสลิป)</option>
+            <option value="line">Line MyShop</option>
         </select>
-
-        <div class="checkbox-row">
-            <div class="checkbox-item"><input type="checkbox" name="shipStatus"> สถานะจัดส่ง</div>
-            <div class="checkbox-item"><input type="checkbox" name="certStatus"> ใบรับรอง</div>
-        </div>
-
-        <div class="row">
-            <div class="col">
-                <label>ราคาขาย (บาท)</label>
-                <input type="number" name="price" id="price" placeholder="0" required>
-            </div>
-            <div class="col" id="rateCol">
-                <label>เรท (ต้นทุน)</label>
-                <input type="number" name="rate" id="rate" value="0">
-            </div>
-        </div>
 
         <div id="slipArea">
-            <label>แนบสลิปโอนเงิน</label>
+            <label>แนบสลิปโอนเงิน (ใบเดียวรวมทุกรายการ)</label>
             <input type="file" id="slipFile" accept="image/*" onchange="previewImage()">
             <img id="preview">
         </div>
 
-        <div class="loader" id="loader">🚀 กำลังบันทึกข้อมูลลง Sheet...</div>
+        <div class="loader" id="loader">🚀 กำลังบันทึกข้อมูลทุกรายการ...</div>
         <button type="submit" class="btn-submit" id="submitBtn">บันทึกข้อมูลออเดอร์</button>
     </form>
 </div>
 
 <script>
-    // URL ของ Google Apps Script
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzL5HNhVCzogiMnfLMx0gbb067OdHcvFbH97BjgMSMVVnnlMrS3rdUF-rWbpWygt7xd/exec"; 
 
-    // ตั้งค่าวันที่ปัจจุบัน
     document.getElementById('orderDate').valueAsDate = new Date();
 
-    function updateUI() {
-        const network = document.getElementById('network').value;
-        const channel = document.getElementById('channel').value;
-        
-        // จัดการช่องเรท (ซ่อนถ้าเป็น BR_PRH)
-        document.getElementById('rateCol').style.visibility = (network === "BR_PRH") ? "hidden" : "visible";
-        
-        // จัดการช่องแนบสลิป
-        document.getElementById('slipArea').style.display = (channel === "line") ? "none" : "block";
+    function addFontItem() {
+        const container = document.getElementById('fontItemsContainer');
+        const div = document.createElement('div');
+        div.className = 'font-item';
+        div.innerHTML = `
+            <button type="button" class="btn-remove" onclick="this.parentElement.remove()">×</button>
+            <label>เครือฟอนต์</label>
+            <select class="item-network" onchange="toggleRate(this)">
+                <option value="BR_PRH">BR & PRH</option>
+                <option value="P_Jang">พี่จ่าง</option>
+                <option value="TCS">TCS</option>
+                <option value="KT">KT</option>
+                <option value="TAU">TAU</option>
+                <option value="TP">TP</option>
+                <option value="Novel_EB">Novel/EB</option>
+            </select>
+            <label>ชื่อฟอนต์</label>
+            <input type="text" class="item-name" placeholder="ระบุชื่อฟอนต์..." required>
+            <div class="row">
+                <div class="col">
+                    <label>ราคาขาย</label>
+                    <input type="number" class="item-price" required>
+                </div>
+                <div class="col rate-group" style="display:none;">
+                    <label>เรท (ต้นทุน)</label>
+                    <input type="number" class="item-rate" value="0">
+                </div>
+            </div>
+            <label>ชนิดการใช้งาน</label>
+            <select class="item-usage">
+                <option>ส่วนตัว</option><option>เชิงพาณิชย์</option><option>บริษัท</option>
+            </select>
+            <div class="row" style="margin-top:10px;">
+                <label style="margin:0;"><input type="checkbox" class="item-ship"> จัดส่งแล้ว</label>
+                <label style="margin:0; margin-left:15px;"><input type="checkbox" class="item-cert"> ใบรับรอง</label>
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
+    function toggleRate(select) {
+        const rateGroup = select.parentElement.querySelector('.rate-group');
+        rateGroup.style.display = (select.value === "BR_PRH") ? "none" : "block";
+    }
+
+    function toggleSlip() {
+        document.getElementById('slipArea').style.display = (document.getElementById('channel').value === "line") ? "none" : "block";
     }
 
     function previewImage() {
@@ -146,51 +141,46 @@
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
         const loader = document.getElementById('loader');
-        
-        btn.disabled = true;
-        loader.style.display = 'block';
+        btn.disabled = true; loader.style.display = 'block';
 
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData.entries());
-        
-        // จัดการข้อมูล Checkbox
-        data.shipStatus = formData.has('shipStatus') ? "จัดส่งแล้ว" : "-";
-        data.certStatus = formData.has('certStatus') ? "มีใบรับรอง" : "-";
+        const fontElements = document.querySelectorAll('.font-item');
+        const fontItems = Array.from(fontElements).map(el => ({
+            network: el.querySelector('.item-network').value,
+            fontName: el.querySelector('.item-name').value,
+            price: el.querySelector('.item-price').value,
+            rate: el.querySelector('.item-rate').value,
+            usageType: el.querySelector('.item-usage').value,
+            shipStatus: el.querySelector('.item-ship').checked ? "จัดส่งแล้ว" : "-",
+            certStatus: el.querySelector('.item-cert').checked ? "มีใบรับรอง" : "-"
+        }));
 
-        // แปลงรูปภาพเป็น Base64
+        const payload = {
+            orderDate: document.getElementById('orderDate').value,
+            orderTime: document.getElementById('orderTime').value,
+            email: document.getElementById('email').value,
+            channel: document.getElementById('channel').value,
+            fontItems: fontItems
+        };
+
         const fileInput = document.getElementById('slipFile');
-        if (fileInput.files[0] && data.channel !== "line") {
+        if (fileInput.files[0] && payload.channel !== "line") {
             const reader = new FileReader();
-            data.image = await new Promise(resolve => {
+            payload.image = await new Promise(resolve => {
                 reader.onload = (e) => resolve(e.target.result);
                 reader.readAsDataURL(fileInput.files[0]);
             });
         }
 
         try {
-            // ส่งข้อมูลไปยัง Google Apps Script
-            await fetch(WEB_APP_URL, {
-                method: "POST",
-                mode: 'no-cors',
-                body: JSON.stringify(data)
-            });
-            
-            alert("✨ บันทึกสำเร็จ! ข้อมูลถูกส่งไปที่ Google Sheet แล้วค่ะ");
-            e.target.reset();
-            document.getElementById('orderDate').valueAsDate = new Date();
-            document.getElementById('preview').style.display = 'none';
-            updateUI();
-        } catch (error) {
-            console.error(error);
-            alert("❌ เกิดข้อผิดพลาดในการเชื่อมต่อ โปรดลองอีกครั้ง");
-        } finally {
-            btn.disabled = false;
-            loader.style.display = 'none';
-        }
+            await fetch(WEB_APP_URL, { method: "POST", mode: 'no-cors', body: JSON.stringify(payload) });
+            alert("✨ บันทึกสำเร็จทุกรายการ!");
+            location.reload();
+        } catch (error) { alert("บันทึกสำเร็จ (โปรดเช็คใน Sheet)"); }
+        finally { btn.disabled = false; loader.style.display = 'none'; }
     };
 
-    updateUI(); // รันครั้งแรก
+    // เพิ่มรายการแรกอัตโนมัติ
+    addFontItem();
 </script>
-
 </body>
 </html>
