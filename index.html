@@ -115,8 +115,8 @@
 </div>
 
 <script>
-    // *** เปลี่ยนเป็น URL ของคุณที่นี่ ***
-    const WEB_APP_URL = "ใส่_WEB_APP_URL_ของคุณที่นี่"; 
+    // URL ของ Google Apps Script
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzL5HNhVCzogiMnfLMx0gbb067OdHcvFbH97BjgMSMVVnnlMrS3rdUF-rWbpWygt7xd/exec"; 
 
     // ตั้งค่าวันที่ปัจจุบัน
     document.getElementById('orderDate').valueAsDate = new Date();
@@ -153,11 +153,11 @@
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData.entries());
         
-        // ติ๊กถูกเป็นข้อความ
+        // จัดการข้อมูล Checkbox
         data.shipStatus = formData.has('shipStatus') ? "จัดส่งแล้ว" : "-";
         data.certStatus = formData.has('certStatus') ? "มีใบรับรอง" : "-";
 
-        // แปลงรูปภาพ
+        // แปลงรูปภาพเป็น Base64
         const fileInput = document.getElementById('slipFile');
         if (fileInput.files[0] && data.channel !== "line") {
             const reader = new FileReader();
@@ -168,17 +168,21 @@
         }
 
         try {
+            // ส่งข้อมูลไปยัง Google Apps Script
             await fetch(WEB_APP_URL, {
                 method: "POST",
                 mode: 'no-cors',
                 body: JSON.stringify(data)
             });
+            
             alert("✨ บันทึกสำเร็จ! ข้อมูลถูกส่งไปที่ Google Sheet แล้วค่ะ");
             e.target.reset();
             document.getElementById('orderDate').valueAsDate = new Date();
             document.getElementById('preview').style.display = 'none';
+            updateUI();
         } catch (error) {
-            alert("❌ บันทึกสำเร็จ (แต่ระบบแจ้งเตือน Error โปรดเช็คที่ชีท)");
+            console.error(error);
+            alert("❌ เกิดข้อผิดพลาดในการเชื่อมต่อ โปรดลองอีกครั้ง");
         } finally {
             btn.disabled = false;
             loader.style.display = 'none';
